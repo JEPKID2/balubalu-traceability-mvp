@@ -1,0 +1,17 @@
+[
+  {
+    "qrCodeId": "BALU-QR-0001",
+    "lotCode": "LOTE-UR-2026-001",
+    "latitude": null,
+    "longitude": null,
+    "permissionStatus": "denied",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Codex/26.519.81530 Chrome/148.0.7778.97 Electron/42.1.0 Safari/537.36",
+    "language": "es-419",
+    "createdAt": "2026-05-29T12:21:01.935Z",
+    "originCity": "Apartadó",
+    "originRegion": "Urabá",
+    "originCountry": "Colombia",
+    "locationLabel": null,
+    "id": "df550f3e-e4b9-4f9e-aa3f-681b5d28ba63"
+  }
+]
