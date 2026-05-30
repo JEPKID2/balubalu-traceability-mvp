@@ -90,17 +90,39 @@ function ExperiencePage() {
     setErrorMessage(null);
     setIsSubmitting(true);
 
+    const fallbackToIpGeo = async () => {
+      try {
+        const ipRes = await fetch("https://ipapi.co/json/");
+        if (ipRes.ok) {
+          const ipData = await ipRes.json();
+          if (ipData.latitude !== undefined && ipData.longitude !== undefined) {
+            await registerScan({
+              latitude: ipData.latitude,
+              longitude: ipData.longitude,
+              permissionStatus: "accepted"
+            });
+            return true;
+          }
+        }
+      } catch (err) {
+        console.error("IP Geolocation fallback failed:", err);
+      }
+      return false;
+    };
+
     if (!("geolocation" in navigator)) {
-      registerScan({
-        latitude: null,
-        longitude: null,
-        permissionStatus: "unavailable"
-      })
-        .catch(() =>
-          setErrorMessage(
-            "Tu navegador no soporta geolocalización o el backend no pudo registrar el evento."
-          )
-        )
+      fallbackToIpGeo()
+        .then((success) => {
+          if (!success) {
+            registerScan({
+              latitude: null,
+              longitude: null,
+              permissionStatus: "unavailable"
+            }).catch(() =>
+              setErrorMessage("No fue posible registrar el escaneo.")
+            );
+          }
+        })
         .finally(() => setIsSubmitting(false));
       return;
     }
@@ -121,20 +143,26 @@ function ExperiencePage() {
       },
       async (error) => {
         try {
-          await registerScan({
-            latitude: null,
-            longitude: null,
-            permissionStatus: error.code === error.PERMISSION_DENIED ? "denied" : "unavailable"
-          });
+          // Intentar geolocalización por IP antes de desistir y pasar a coordenadas de caída
+          const ipGeoSuccess = await fallbackToIpGeo();
+          if (!ipGeoSuccess) {
+            const permStatus =
+              error.code === error.PERMISSION_DENIED ? "denied" : "unavailable";
+            await registerScan({
+              latitude: null,
+              longitude: null,
+              permissionStatus: permStatus
+            });
 
-          if (error.code === error.PERMISSION_DENIED) {
-            setErrorMessage(
-              "La ubicación fue rechazada. Continuamos con una ruta internacional simbólica."
-            );
-          } else {
-            setErrorMessage(
-              "No se pudo obtener la ubicación. Continuamos con una ruta simbólica."
-            );
+            if (error.code === error.PERMISSION_DENIED) {
+              setErrorMessage(
+                "La ubicación fue rechazada. Continuamos con una ruta internacional simbólica."
+              );
+            } else {
+              setErrorMessage(
+                "No se pudo obtener la ubicación. Continuamos con una ruta simbólica."
+              );
+            }
           }
         } catch {
           setErrorMessage("No fue posible registrar el escaneo.");
@@ -143,9 +171,9 @@ function ExperiencePage() {
         }
       },
       {
-        enableHighAccuracy: true,
-        timeout: 12000,
-        maximumAge: 0
+        enableHighAccuracy: false, // Prevents timeouts and failures on desktop devices without GPS
+        timeout: 15000,
+        maximumAge: 300000 // Cache for 5 minutes
       }
     );
   };

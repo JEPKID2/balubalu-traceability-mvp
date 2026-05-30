@@ -17,7 +17,7 @@ export default async function AdminLoginPage() {
   const hint =
     process.env.NODE_ENV !== "production" && defaultDevUser
       ? `Modo desarrollo: usuario "${defaultDevUser.username}", contraseña "${defaultDevUser.password}" y rol ${defaultDevUser.role}. Cambia estas credenciales con BALU_AUTH_USERS antes de producción.`
-      : null;
+      : undefined;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#07131c] px-6 py-10">

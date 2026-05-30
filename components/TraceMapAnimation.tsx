@@ -1,6 +1,6 @@
 "use client";
 
-import "leaflet/dist/leaflet.css";
+// Removed Leaflet CSS import since we now use Three.js 3D Globe
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
@@ -10,7 +10,7 @@ import { Boxes, Globe2, Navigation, ScanLine } from "lucide-react";
 import type { PermissionStatus } from "@/lib/types/scan";
 import { calculateDistanceKm } from "@/lib/utils/calculateDistanceKm";
 
-const LeafletMap = dynamic(() => import("@/components/TraceMapCanvas"), { ssr: false });
+const TraceGlobeCanvas = dynamic(() => import("@/components/TraceGlobeCanvas"), { ssr: false });
 
 const origin = {
   latitude: 7.883,
@@ -34,9 +34,9 @@ export function TraceMapAnimation({
   onNext
 }: TraceMapAnimationProps) {
   const fallbackDestination = {
-    latitude: 39.5,
-    longitude: -18.5,
-    label: "Destino internacional no identificado"
+    latitude: 51.9244,
+    longitude: 4.4777,
+    label: "Puerto de Rotterdam, Países Bajos"
   };
 
   const resolvedDestination =
@@ -94,7 +94,7 @@ export function TraceMapAnimation({
             </div>
 
             <div className="relative h-[52vh] min-h-[380px] overflow-hidden rounded-[1.5rem] border border-white/10">
-              <LeafletMap origin={origin} destination={resolvedDestination} />
+              <TraceGlobeCanvas origin={origin} destination={resolvedDestination} />
 
               {!hasIntroFinished ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#06131b]/82 backdrop-blur-sm">
@@ -158,9 +158,8 @@ export function TraceMapAnimation({
                     </span>
                   </p>
                   <p>
-                    Comentario técnico: este mapa está pensado para un MVP con Leaflet.
-                    Luego se puede reemplazar por un globo 3D premium con Three.js o
-                    React Three Fiber sin tocar el flujo principal.
+                    Comentario técnico: ¡Mapa Leaflet original reemplazado exitosamente
+                    por un globo interactivo 3D premium con Three.js para una experiencia inmersiva!
                   </p>
                 </div>
               </div>
