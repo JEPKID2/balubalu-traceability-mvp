@@ -6,6 +6,8 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { CalendarDays, Package2, Radar, ShieldCheck } from "lucide-react";
 
+import { AdminLogoutButton } from "@/components/AdminLogoutButton";
+import type { AuthSession } from "@/lib/auth/session";
 import type { PermissionStatus, ScanRecord } from "@/lib/types/scan";
 import { formatDate } from "@/lib/utils/formatDate";
 
@@ -13,9 +15,10 @@ const AdminMap = dynamic(() => import("@/components/AdminMap"), { ssr: false });
 
 type AdminDashboardProps = {
   scans: ScanRecord[];
+  session: AuthSession;
 };
 
-export function AdminDashboard({ scans }: AdminDashboardProps) {
+export function AdminDashboard({ scans, session }: AdminDashboardProps) {
   const [dateFilter, setDateFilter] = useState("");
   const [lotFilter, setLotFilter] = useState("");
   const [permissionFilter, setPermissionFilter] = useState<PermissionStatus | "all">("all");
@@ -53,15 +56,34 @@ export function AdminDashboard({ scans }: AdminDashboardProps) {
     <div className="min-h-screen bg-[#07131c] px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <header className="space-y-4">
-          <p className="text-sm uppercase tracking-[0.3em] text-lime">/admin</p>
-          <h1 className="font-[var(--font-display)] text-4xl font-semibold text-white">
-            Dashboard administrativo Balú
-          </h1>
-          <p className="max-w-3xl text-base leading-8 text-sky/70">
-            MVP sin autenticación. Antes de producción, esta ruta debería protegerse
-            con autenticación, autorización por roles y persistencia en una base de
-            datos administrada.
-          </p>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="space-y-4">
+              <p className="text-sm uppercase tracking-[0.3em] text-lime">/admin</p>
+              <h1 className="font-[var(--font-display)] text-4xl font-semibold text-white">
+                Dashboard administrativo Balú
+              </h1>
+              <p className="max-w-3xl text-base leading-8 text-sky/70">
+                Acceso protegido con sesión y control de roles para el panel
+                administrativo del MVP.
+              </p>
+            </div>
+
+            <div className="flex flex-col items-start gap-3 rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center">
+              <div>
+                <p className="text-xs uppercase tracking-[0.22em] text-sky/55">
+                  Sesión activa
+                </p>
+                <p className="mt-1 text-sm font-semibold text-white">
+                  {session.displayName}
+                </p>
+                <p className="text-xs uppercase tracking-[0.22em] text-lime">
+                  Rol: {session.role}
+                </p>
+              </div>
+
+              <AdminLogoutButton />
+            </div>
+          </div>
         </header>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
